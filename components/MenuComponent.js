@@ -12,8 +12,10 @@ function Menu(props) {
                 title={item.name}
                 subtitle={item.description}
                 hideChevron={true}
+                onPress={() => props.onPress(item.id)}
                 leftAvatar={{ source: require('./images/uthappizza.png')}}
             />
+
         );
     };
 
