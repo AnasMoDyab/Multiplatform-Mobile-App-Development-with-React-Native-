@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import Menu from "./MenuComponent";
 import DishDetail from './DishdetailComponent';
-import { View, Platform, Text, ScrollView, Image, StyleSheet } from 'react-native';
-import { createStackNavigator, createDrawerNavigator, DrawerItems, SafeAreaView } from 'react-navigation';
+import { View, Platform, Text, ScrollView, Image, StyleSheet, ToastAndroid  } from 'react-native';
+import { createStackNavigator, createDrawerNavigator, DrawerItems, SafeAreaView} from 'react-navigation';
 import { Icon } from 'react-native-elements';
 import Home from './HomeComponent';
 import About from "./AboutComponent";
@@ -12,6 +12,8 @@ import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from '../redux/
 import Reservation from "./ReservationComponent";
 import Favorites from "./FavoriteComponent";
 import Login from "./LoginComponent";
+import NetInfo from "@react-native-community/netinfo";
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -320,7 +322,33 @@ class Main extends Component {
         this.props.fetchComments();
         this.props.fetchPromos();
         this.props.fetchLeaders();
+
+        NetInfo.fetch().then(state => {
+            ToastAndroid.show('Initial NetWork Connectivity type: '
+                + state.type+ ', effectiveType: '+ state.isConnected
+                +ToastAndroid.LONG)
+        });
+        NetInfo.addEventListener(state => {
+            switch (state.type){
+                case 'none':
+                    ToastAndroid.show('You are offline!', ToastAndroid.LONG)
+                    break;
+                case 'wifi':
+                    ToastAndroid.show('You are connected Wifi!', ToastAndroid.LONG)
+                    break;
+                case 'cellular':
+                    ToastAndroid.show('You are connected to Cellular!', ToastAndroid.LONG)
+                    break;
+                case 'unknown':
+                    ToastAndroid.show('You are now have unknown connection!', ToastAndroid.LONG)
+                    break;
+                default:
+                    break;
+            }
+        });
     }
+
+
     render (){
         return (
             <View style={{flex:1, paddingTop: Platform.OS === 'ios' ? 0 : Expo.Constants.statusBarHeight }}>
