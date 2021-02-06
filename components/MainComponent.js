@@ -323,7 +323,7 @@ class Main extends Component {
         this.props.fetchPromos();
         this.props.fetchLeaders();
 
-        NetInfo.fetch().then(state => {
+      /*  NetInfo.fetch().then(state => {
             ToastAndroid.show('Initial NetWork Connectivity type: '
                 + state.type+ ', effectiveType: '+ state.isConnected
                 +ToastAndroid.LONG)
@@ -345,7 +345,7 @@ class Main extends Component {
                 default:
                     break;
             }
-        });
+        });*/
     }
 
 

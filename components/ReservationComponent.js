@@ -5,7 +5,7 @@ import DatePicker from 'react-native-datepicker'
 import * as Animatable from 'react-native-animatable'
 import * as Permissions from 'expo-permissions';
 import * as Notifications from 'expo-notifications';
-
+import * as Calendar from 'expo-calendar';
 
 
 
@@ -61,6 +61,7 @@ class Reservation extends Component {
                 {
                     text: 'Ok',
                     onPress: ()=> {
+                        this.addReservationToCalendar(this.dates)
                         this.presentLocalNotification(this.dates)
                         this.resetForm()
                     }
@@ -102,6 +103,30 @@ class Reservation extends Component {
             title: 'Your reservation',
             body: 'Reservation for '+ date+ ' requested'
         });*/
+    }
+    obtainCalendarPermission() {
+        let permission= Permissions.getAsync(Permissions.CALENDAR);
+        if(permission.status !== 'granted'){
+            permission= Permissions.askAsync(Permissions.CALENDAR);
+            if (permission.status !=='granted'){
+                Alert.alert('Permission not granted to show Calender');
+            }
+        }
+        return permission;
+    }
+    async getDefaultCalendarSource() {
+        const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+        const defaultCalendars = calendars.filter(each => each.source.name === 'Default');
+        return defaultCalendars[0].source;
+    }
+    addReservationToCalendar(date) {
+        this.obtainCalendarPermission();
+        Calendar.createEventAsync(this.getDefaultCalendarSource, {
+            title: 'Con Fusion Table Reservation',
+            startDate: new Date(Date.parse(date)),
+            endDate:new Date(Date.parse(date))+2,
+        })
+
     }
     render() {
 
