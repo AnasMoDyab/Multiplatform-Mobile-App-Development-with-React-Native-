@@ -3,6 +3,13 @@ import {Text, View, ScrollView, StyleSheet, Picker, Switch, Button, Modal, Alert
 import { Card } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
 import * as Animatable from 'react-native-animatable'
+import * as Permissions from 'expo-permissions';
+import * as Notifications from 'expo-notifications';
+
+
+
+
+
 
 class Reservation extends Component {
 
@@ -30,6 +37,7 @@ class Reservation extends Component {
         this.toggleModal();
     }*/
 
+    dates = new Date();
     resetForm() {
         this.setState({
             guests: 1,
@@ -43,7 +51,7 @@ class Reservation extends Component {
             'Your Reservation ok?',
             'Number of Guests: '+ this.state.guests+'\n'+
             'Smoking? '+ this.state.smoking+ '\n'+
-            'Date and time: '+ this.state.date,
+            'Date and time: '+ this.dates,
             [
                 {
                     text: 'Cancel',
@@ -52,13 +60,48 @@ class Reservation extends Component {
                 },
                 {
                     text: 'Ok',
-                    onPress: ()=>this.resetForm()
+                    onPress: ()=> {
+                        this.presentLocalNotification(this.dates)
+                        this.resetForm()
+                    }
                 }
             ]  ,
             {
                 cancelable: false
             }
         );
+    }
+
+    async obtainNotificationPermission (){
+        let permission= Permissions.getAsync(Permissions.USER_FACING_NOTIFICATIONS);
+        if(permission.status !== 'granted'){
+            permission=await Permissions.askAsync(Permissions.USER_FACING_NOTIFICATIONS);
+            if (permission.status !=='granted'){
+                Alert.alert('Permission not granted to show notification');
+            }
+        }
+        return permission;
+    }
+
+    async presentLocalNotification (date) {
+
+        await this.obtainNotificationPermission();
+        await Notifications.setNotificationChannelAsync('default',{
+            title: 'Your reservation',
+            body: 'Reservation for '+ date+ ' requested',
+            ios: {
+                sound: true
+            },
+            android: {
+                sound: true,
+                vibrate: true,
+                color: '#512DA8'
+            }
+        })
+     /*   Permissions.NOTIFICATIONS.presentLocalNotificationAsync({
+            title: 'Your reservation',
+            body: 'Reservation for '+ date+ ' requested'
+        });*/
     }
     render() {
 
@@ -97,7 +140,7 @@ class Reservation extends Component {
                         format=''
                         mode="datetime"
                         placeholder="select date and Time"
-                        minDate="2017-01-01"
+                        minDate={this.dates}
                         confirmBtnText="Confirm"
                         cancelBtnText="Cancel"
                         customStyles={{
