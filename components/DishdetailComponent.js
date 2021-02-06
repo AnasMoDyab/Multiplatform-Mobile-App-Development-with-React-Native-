@@ -31,6 +31,12 @@ function RenderDish(props) {
         else
             return false;
     }
+    const recognizeComment  = ({ moveX, moveY, dx, dy }) => {
+        if ( dx > 0 )
+            return true;
+        else
+            return false;
+    }
 
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: (e, gestureState) => {
@@ -41,7 +47,8 @@ function RenderDish(props) {
             },
         onPanResponderEnd: (e, gestureState) => {
             console.log("pan responder end", gestureState);
-            if (recognizeDrag(gestureState))
+            if (recognizeDrag(gestureState)){
+
                 Alert.alert(
                     'Add Favorite',
                     'Are you sure you wish to add ' + dish.name + ' to favorite?',
@@ -53,6 +60,13 @@ function RenderDish(props) {
                 );
 
             return true;
+            }
+            else if(recognizeComment(gestureState)) {
+
+                props.handleOpenModal();
+                return true;
+            }
+
         }
     })
     if (dish != null) {
@@ -185,36 +199,41 @@ class DishDetail extends Component {
                        onDismiss={() => this.toggleModal}
                        onRequestClose={() => this.toggleModal}>
 
-                    <View style={styles.container}>
+                    <View style={styles.modal}>
                         <Rating showRating fractions="{5}"
                                 startingValue="{3.3}"
                                 onFinishRating={(rating) => this.setState({rating: rating})}/>
 
 
                         <Input
-                            leftIcon={{type: 'font-awesome', name: 'user'}}
-                            placeholder="Author"
-                            editable
-                            maxLength={30}
-                            numberOfLines={1}
-                            underlineColorAndroid="transparent"
-                            onChangeText={(author)=> this.setState({author: author})}
-
+                            placeholder='Author'
+                            leftIconContainerStyle={{
+                                padding: 8
+                            }}
+                            leftIcon={{
+                                type:'font-awesome',
+                                name:'user'
+                            }}
+                            onChangeText={value => this.setState({author: value})}
                         />
 
                         <Input
-                            leftIcon={{type: 'font-awesome', name: 'comment'}}
-                            placeholder="Comments"
-                            editable
-                            maxLength={30}
-                            numberOfLines={1}
-                            underlineColorAndroid="transparent"
-                            onChangeText={(comment)=> this.setState({comment: comment})}
-
+                            placeholder='Comment'
+                            leftIconContainerStyle={{
+                                padding: 8
+                            }}
+                            leftIcon={{
+                                type:'font-awesome',
+                                name:'comment'
+                            }}
+                            onChangeText={value => this.setState({comment: value})}
                         />
 
                         <Button
                             title="Submit"
+                            buttonStyle={{
+                                marginBottom: 20
+                            }}
                             onPress={()=> this.handleSubmit(dishId)}/>
                         <Button
                             title="Cancel"
